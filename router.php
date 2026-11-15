@@ -7,6 +7,7 @@ $asset = realpath($public . $assetPath);
 if ($path !== '/' && $asset && str_starts_with($asset, realpath($public)) && is_file($asset)) {
     $mime = match (strtolower(pathinfo($asset, PATHINFO_EXTENSION))) {
         'css' => 'text/css; charset=utf-8', 'js' => 'application/javascript; charset=utf-8',
+        'webmanifest' => 'application/manifest+json; charset=utf-8', 'json' => 'application/json; charset=utf-8',
         'png' => 'image/png', 'jpg', 'jpeg' => 'image/jpeg', 'svg' => 'image/svg+xml', default => 'application/octet-stream'
     };
     header('Content-Type: ' . $mime);

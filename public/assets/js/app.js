@@ -124,6 +124,7 @@ async function renderMyOrders() {
     $('#myDone').textContent = orders.filter((order) => order.status === 'Selesai').length;
     $('#tableCount').textContent = `${orders.length} PESANAN`;
     $('#myEmpty').style.display = orders.length ? 'none' : 'block';
+    $('#myOrdersTable').style.display = orders.length ? 'table' : 'none';
     $('#myOrders').innerHTML = orders.map((order) => `<tr><td><strong>${escapeHtml(order.id)}</strong></td><td>${escapeHtml(order.package)}</td><td>${escapeHtml(formatDate(order.created_at))}</td><td>${escapeHtml(order.notes || '—')}${order.admin_notes ? `<br><small>Admin: ${escapeHtml(order.admin_notes)}</small>` : ''}</td><td><span class="status ${statusClass(order.status)}">${escapeHtml(order.status)}</span></td></tr>`).join('');
   } catch (error) { toast(error.message); }
 }
@@ -182,6 +183,7 @@ async function renderAdmin() {
     $('#adminCustomers').textContent = new Set(allOrders.map((order) => order.username)).size;
     $('#adminRevenue').textContent = 'Rp' + allOrders.reduce((sum, order) => sum + Number(order.price), 0).toLocaleString('id-ID');
     $('#adminEmpty').style.display = result.orders.length ? 'none' : 'block';
+    $('#adminOrdersTable').style.display = result.orders.length ? 'table' : 'none';
     $('#adminOrders').innerHTML = result.orders.map((order) => `<tr><td><strong>${escapeHtml(order.code)}</strong><br><a href="${escapeHtml(order.drive_url || '#')}" target="_blank" rel="noopener" ${order.drive_url ? '' : 'aria-disabled="true"'}>Lihat website ↗</a></td><td><strong>${escapeHtml(order.name)}</strong><br><span style="color:#81837b">${escapeHtml(order.email)}</span></td><td><select class="filter" id="pkg-${escapeHtml(order.code)}"><option ${order.package === 'Short & simple' ? 'selected' : ''}>Short & simple</option><option ${order.package === 'Creator cut' ? 'selected' : ''}>Creator cut</option><option ${order.package === 'Project cut' ? 'selected' : ''}>Project cut</option></select></td><td><input class="filter" id="deadline-${escapeHtml(order.code)}" value="${escapeHtml(order.deadline)}" aria-label="Target selesai"><textarea class="filter" id="notes-${escapeHtml(order.code)}" aria-label="Catatan klien">${escapeHtml(order.notes)}</textarea><textarea class="filter" id="adminnotes-${escapeHtml(order.code)}" aria-label="Catatan admin" placeholder="Catatan untuk klien">${escapeHtml(order.admin_notes || '')}</textarea></td><td>Rp${Number(order.price).toLocaleString('id-ID')}</td><td><select class="filter" id="status-${escapeHtml(order.code)}">${['Menunggu konfirmasi', 'Dalam pengerjaan', 'Selesai'].map((status) => `<option ${status === order.status ? 'selected' : ''}>${status}</option>`).join('')}</select><div class="order-actions"><button class="btn small" onclick="saveOrder('${escapeHtml(order.code)}')">Simpan / tandai selesai</button><button class="btn small" onclick="deleteOrder('${escapeHtml(order.code)}')">Hapus</button></div></td></tr>`).join('');
   } catch (error) { toast(error.message); }
 }
@@ -231,3 +233,11 @@ sessionReady = request('/api/auth.php?action=me').then(({ user }) => {
   return null;
 });
 sessionReady.then(() => orderPackageFromQuery());
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.warn('PWA service worker belum dapat dipasang.', error);
+    });
+  });
+}

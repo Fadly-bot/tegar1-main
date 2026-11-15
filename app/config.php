@@ -24,6 +24,66 @@ function app_env(string $name, string $default = ''): string
     return $fileValues[$name] ?? $default;
 }
 
+/** Use the hosted Supabase API when configured; keep MySQL for local XAMPP/Laragon. */
+function supabase_proxy_enabled(): bool
+{
+    return app_env('SUPABASE_URL') !== '' && app_env('SUPABASE_ANON_KEY') !== '';
+}
+
+function supabase_proxy(): never
+{
+    $base = rtrim(app_env('SUPABASE_URL'), '/') . '/functions/v1/potong-api';
+    $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+    $query = $_GET;
+    $query['path'] = $script;
+    $url = $base . '?' . http_build_query($query);
+    $anonKey = app_env('SUPABASE_ANON_KEY');
+    $accessToken = (string)($_COOKIE['potong_access'] ?? '');
+    $headers = [
+        'apikey: ' . $anonKey,
+        'Authorization: Bearer ' . ($accessToken !== '' ? $accessToken : $anonKey),
+        'Content-Type: application/json',
+    ];
+    $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_TIMEOUT => 20,
+        CURLOPT_FOLLOWLOCATION => false,
+    ]);
+    if (!in_array($method, ['GET', 'HEAD'], true)) {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents('php://input') ?: '{}');
+    }
+    $body = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    if ($body === false) {
+        json_response(['error' => 'Layanan database belum dapat dihubungi.', 'code' => 'SUPABASE_UNAVAILABLE'], 503);
+    }
+    http_response_code($status ?: 502);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    $payload = json_decode($body, true);
+    if (is_array($payload) && isset($payload['token']) && in_array($script, ['/api/auth.php'], true)) {
+        setcookie('potong_access', (string)$payload['token'], [
+            'expires' => time() + 60 * 60 * 24 * 30,
+            'path' => '/',
+            'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || app_env('VERCEL') !== '',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+        unset($payload['token']);
+        $body = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    if (is_array($payload) && $script === '/api/auth.php' && ($_GET['action'] ?? '') === 'logout') {
+        setcookie('potong_access', '', ['expires' => time() - 3600, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
+    }
+    echo $body;
+    exit;
+}
+
 $sessionName = app_env('SESSION_NAME', 'potong_session');
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_name($sessionName);
