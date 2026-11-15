@@ -1,0 +1,32 @@
+<main id="authView" class="view">
+    <div class="auth-wrap">
+        <aside class="auth-aside">
+            <a class="brand" href="#" onclick="showView('home')">
+                <span class="brand-mark">P</span> potong<span style="font:10px var(--mono);letter-spacing:0">.studio</span></a>
+                <div><p class="mono">RUANG KERJA KREATIF / 2026</p>
+                <h1>Selangkah lagi,<br>ceritamu mulai.</h1>
+                <p>Masuk untuk melihat pesanan, atau buat akun klien untuk memilih paket edit.</p>
+            </div><span class="mono">BUAT VIDEO YANG TERASA KAMU.</span>
+        </aside>
+        <div class="auth-formside"><form class="auth-card" id="loginForm">
+            <p class="mono">AKUN KLIEN / ADMIN</p>
+            <h2>Selamat datang.</h2><p>Masuk untuk melihat pesanan atau mengelola proyek.</p>
+            <div id="loginMsg" class="msg"></div>
+            <div class="field"><label for="loginUser">Username</label>
+            <input id="loginUser" required autocomplete="username" placeholder="contoh: rani"></div>
+            <div class="field"><label for="loginPass">Password</label><input id="loginPass" required type="password" autocomplete="current-password" placeholder="Masukkan password"></div>
+            <button class="btn dark" type="submit">Masuk ke akun <span>↗</span></button>
+            <p class="switch">Belum punya akun? <a href="#" onclick="authMode('register');return false">Daftar sekarang</a></p>
+            <p class="hint">AKUN DEMO ADMIN: username <b>a</b> · password <b>a</b><br>AKUN DEMO KLIEN: username <b>b</b> · password <b>b</b></p></form>
+            <form class="auth-card" id="registerForm" style="display:none"><p class="mono">AKUN PELANGGAN</p>
+            <h2>Buat akun demo.</h2><p>Daftar supaya kamu bisa menyimpan dan melihat pesanan.</p>
+            <div id="registerMsg" class="msg"></div><div class="field"><label for="regName">Nama</label>
+            <input id="regName" required placeholder="Nama kamu"></div>
+            <div class="field"><label for="regEmail">Email</label>
+            <input id="regEmail" required type="email" placeholder="nama@email.com"></div>
+            <div class="field"><label for="regUser">Username</label><input id="regUser" required autocomplete="username" placeholder="Pilih username"></div>
+            <div class="field"><label for="regPass">Password</label><input id="regPass" required type="password" minlength="1" autocomplete="new-password" placeholder="Buat password"></div>
+            <button class="btn dark" type="submit">Buat akun <span>↗</span></button>
+            <p class="switch">Sudah punya akun? <a href="#" onclick="authMode('login');return false">Masuk</a></p>
+            <p class="hint">Akun klien disimpan di database.</p></form></div></div>
+</main>
