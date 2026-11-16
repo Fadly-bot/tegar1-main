@@ -6,6 +6,10 @@
       "maxDuration": 10
     }
   },
+  "redirects": [
+    { "source": "/", "destination": "/api/home.php", "statusCode": 307 },
+    { "source": "/index.php", "destination": "/api/home.php", "statusCode": 307 }
+  ],
   "rewrites": [
     { "source": "/assets/(.*)", "destination": "/public/assets/$1" },
     { "source": "/icons/(.*)", "destination": "/public/icons/$1" },
