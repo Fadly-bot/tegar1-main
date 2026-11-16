@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.tegar1_main.twa",
+      "sha256_cert_fingerprints": [
+        "03:17:1B:B0:DD:BA:2C:D3:85:BC:52:B6:61:CD:B3:5B:BC:6F:AE:AC:19:AD:C9:86:EB:30:56:63:55:31:1D:3A"
+      ]
+    }
+  }
+]

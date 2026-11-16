@@ -15,6 +15,7 @@
     { "source": "/icons/(.*)", "destination": "/public/icons/$1" },
     { "source": "/manifest.webmanifest", "destination": "/public/manifest.webmanifest" },
     { "source": "/sw.js", "destination": "/public/sw.js" },
+    { "source": "/.well-known/assetlinks.json", "destination": "/public/.well-known/assetlinks.json" },
     { "source": "/((?!api/|assets/).*)", "destination": "/api/home.php" }
   ]
 }
